@@ -1,0 +1,148 @@
+AirlineReservationSystem.java (30% - version)
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+
+class Flight {
+    private String flightId;
+    private String airline;
+    private String source;
+    private String destination;
+    private String time;
+    private double price;
+
+    public Flight(String flightId, String airline, String source, String destination, String time, double price) {
+        this.flightId = flightId;
+        this.airline = airline;
+        this.source = source;
+        this.destination = destination;
+        this.time = time;
+        this.price = price;
+    }
+
+    public String getFlightId() {
+        return flightId;
+    }
+
+    @Override
+    public String toString() {
+        return "Flight ID: " + flightId +
+               ", Airline: " + airline +
+               ", From: " + source +
+               ", To: " + destination +
+               ", Time: " + time +
+               ", Price: ₹" + price;
+    }
+}
+
+
+class Booking {
+    private Flight flight;
+    private String status;
+
+    public Booking(Flight flight) {
+        this.flight = flight;
+        this.status = "Confirmed";
+    }
+
+    @Override
+    public String toString() {
+        return flight.toString() + " | Status: " + status;
+    }
+}
+
+class User {
+    private String username;
+    private ArrayList<Booking> bookings;
+
+    public User(String username) {
+        this.username = username;
+        this.bookings = new ArrayList<>();
+    }
+
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+    }
+
+    public void viewBookings() {
+        if (bookings.isEmpty()) {
+            System.out.println("No bookings found.");
+        } else {
+            System.out.println("\n--- Booking History for " + username + " ---");
+            for (Booking booking : bookings) {
+                System.out.println(booking);
+            }
+        }
+    }
+}
+
+
+public class AirlineReservationSystem {
+    private static ArrayList<Flight> flights = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+    private static User currentUser;
+
+    public static void main(String[] args) {
+        loadSampleFlights();
+
+        System.out.print("Enter your username: ");
+        String username = scanner.nextLine();
+        currentUser = new User(username);
+
+        boolean running = true;
+        while (running) {
+            System.out.println("\n--- Airline Reservation System ---");
+            System.out.println("1. View Flights");
+            System.out.println("2. Book Flight");
+            System.out.println("3. View My Bookings");
+            System.out.println("4. Exit");
+            System.out.print("Choose option: ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1" -> viewFlights();
+                case "2" -> bookFlight();
+                case "3" -> currentUser.viewBookings();
+                case "4" -> {
+                    System.out.println("Thank you for using ARS. Goodbye!");
+                    running = false;
+                }
+                default -> System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+    private static void loadSampleFlights() {
+        flights.add(new Flight("F001", "Air India", "Chennai", "Delhi", "10:00 AM", 4500));
+        flights.add(new Flight("F002", "IndiGo", "Delhi", "Mumbai", "1:00 PM", 3500));
+        flights.add(new Flight("F003", "SpiceJet", "Bangalore", "Kolkata", "4:30 PM", 5000));
+    }
+
+    private static void viewFlights() {
+        System.out.println("\n--- Available Flights ---");
+        for (Flight flight : flights) {
+            System.out.println(flight);
+        }
+    }
+
+    private static void bookFlight() {
+        System.out.print("Enter Flight ID to book: ");
+        String id = scanner.nextLine();
+
+        boolean found = false;
+        for (Flight flight : flights) {
+            if (flight.getFlightId().equalsIgnoreCase(id)) {
+                Booking booking = new Booking(flight);
+                currentUser.addBooking(booking);
+                System.out.println("Booking confirmed!");
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Flight ID not found. Please try again.");
+        }
+    }
+}
